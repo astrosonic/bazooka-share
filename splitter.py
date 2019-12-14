@@ -1,4 +1,6 @@
-import hashlib
+import hashlib, sqlite3, os
+from colorama import init, Fore, Style
+init()
 
 def nogenten(numvalue):
     strvalue=""
@@ -76,6 +78,94 @@ def spltsize(filename,partsize):
     for i in hashlist.keys():
         print(i+"\t"+hashlist[i])
 
+def makeldgr(filename,hashlist,sizelist,cuntlist):
+    ldgrname=filename+".ldg"
+    actifile=open(ldgrname,"wb")
+    actifile.close()
+    ldgrbase=sqlite3.connect(ldgrname)
+    ldgrbase.execute("create table ldgrbase (partnumb text primary key not null, partname text not null, partsize int not null, sha512dg text not null);")
+    for i in hashlist.keys():
+        querystr="insert into ldgrbase (partnumb, partname, partsize, sha512dg) values ('"+str(cuntlist[i])+"', '"+str(i)+"', "+str(sizelist[i])+", '"+str(hashlist[i])+"')"
+        ldgrbase.execute(querystr)
+    ldgrbase.commit()
+    ldgrbase.close()
+
+def readldgr(ldgrname):
+    ldgrbase=sqlite3.connect(ldgrname)
+    dbcursor=ldgrbase.execute("select * from ldgrbase")
+    hashlist,sizelist,cuntlist={},{},{}
+    for row in dbcursor:
+        cuntlist[row[1]]=row[0]
+        sizelist[row[1]]=row[2]
+        hashlist[row[1]]=row[3]
+    ldgrbase.close()
+    ldgrlist=[cuntlist,sizelist,hashlist]
+    return ldgrlist
+
+def displdgr(ldgrname):
+    ldgrbase=sqlite3.connect(ldgrname)
+    dbcursor=ldgrbase.execute("select * from ldgrbase")
+    hashlist,sizelist,cuntlist={},{},{}
+    for row in dbcursor:
+        print("Part count  : "+str(row[0])+"\n"+\
+              "Part name   : "+str(row[1])+"\n"+\
+              "Part size   : "+str(row[2])+"\n"+\
+              "SHA512 hash : "+str(row[3]))
+    ldgrbase.close()
+
+def pthealth(cuntlist,sizelist,hashlist):
+    failcunt,passcunt=0,0
+    chekcunt,misscunt=0,0
+    for i in cuntlist.keys():
+        chekcunt+=1
+        try:
+            actifile=open(i,"rb")
+            actibuff=actifile.read()
+            actifile.close()
+            preshash=hashlib.sha512(actibuff).hexdigest()
+            if preshash==hashlist[i]:
+                passcunt+=1
+            else:
+                failcunt+=1
+        except FileNotFoundError:
+            misscunt+=1
+    joinable=False
+    if chekcunt==passcunt:
+        joinable=True
+    print(Fore.GREEN+"File health check has been performed"+"\n"+
+          Style.RESET_ALL+\
+          "Total checks          : "+str(chekcunt)+"\n"+\
+          "Files with wrong hash : "+str(failcunt)+"\n"+\
+          "Files with match hash : "+str(passcunt)+"\n"+\
+          "Files missing         : "+str(misscunt)+"\n"+\
+          "Health result         : "+str(joinable)+"\n")
+    return joinable
+
+def joincunt(filename):
+    ldgrname=filename+".ldg"
+    ldgrlist=readldgr(ldgrname)
+    cuntlist=ldgrlist[0]
+    sizelist=ldgrlist[1]
+    hashlist=ldgrlist[2]
+    if (pthealth(cuntlist,sizelist,hashlist)):
+        print(Fore.GREEN+"Initiating join procedure..."+Style.RESET_ALL)
+        actibuff=b""
+        for i in cuntlist.keys():
+            blocfile=open(i,"rb")
+            blocbuff=blocfile.read()
+            blocfile.close()
+            os.system("rm "+i)
+            actibuff+=blocbuff
+            print("Joined "+i+" to parent file (100%)")
+        actifile=open(filename,"wb")
+        actifile.write(actibuff)
+        actifile.close()
+        os.system("rm "+ldgrname)
+        print(Fore.GREEN+"Join process successfully completed!"+Style.RESET_ALL)
+    else:
+        print(Fore.RED+"Join procedure could not be initiated!"+Style.RESET_ALL+"\n"+\
+              "Some parts are missing or corrupted - Download them again")
+
 def spltcunt(filename,partcunt):
     actifile=open(filename,"rb")
     actibuff=actifile.read()
@@ -103,11 +193,15 @@ def spltcunt(filename,partcunt):
             blocfile=open(blocname,"wb")
             blocfile.write(blocbuff)
             blocfile.close()
-    elif partcunt>1000:
-        print("Parts count greater than 1000 is not recommended!")
-    print("LZMA SPLITTER [by t0xic0der]\n"+\
-          "File name  : "+filename+"\n"+\
-          "File size  : "+str(buffsize)+" bytes\n"+\
-          "Part count : "+str(partcunt)+" parts")
+    elif partcunt>=1000:
+        print("Parts count greater than or equal to 1000 is not recommended!")
+        exit()
+    print(Fore.GREEN+"PROTEXON SPLITTER [by t0xic0der]"+Style.RESET_ALL+"\n"+\
+          "File name   : "+filename+"\n"+\
+          "File size   : "+str(buffsize)+" bytes\n"+\
+          "Part count  : "+str(partcunt)+" parts\n"+\
+          "Ledger name : "+filename+".ldg\n")
+    makeldgr(filename,hashlist,sizelist,cuntlist)
+    print(Fore.GREEN+"FILE PARTS"+Style.RESET_ALL)
     for i in hashlist.keys():
         print(str(cuntlist[i])+"\t"+str(i)+"\t\t"+str(sizelist[i])+" bytes\t"+str(hashlist[i]))

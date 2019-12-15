@@ -190,7 +190,7 @@ def spltcunt(filename,partcunt):
             "File size   : "+str(buffsize)+" bytes\n"+\
             "Part count  : "+str(partcunt)+" parts\n"+\
             "Ledger name : "+filename+".ldg\n")
-        if partcunt>=10 and partcunt<100:
+        if partcunt>=10 and partcunt<=100:
             print(Fore.GREEN+"FILE PARTS"+Style.RESET_ALL)
             for i in range(1,partcunt+1):
                 blocname=filename+"."+nogenten(i)

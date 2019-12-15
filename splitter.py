@@ -91,15 +91,19 @@ def makeldgr(filename,hashlist,sizelist,cuntlist):
     ldgrbase.close()
 
 def readldgr(ldgrname):
-    ldgrbase=sqlite3.connect(ldgrname)
-    dbcursor=ldgrbase.execute("select * from ldgrbase")
-    hashlist,sizelist,cuntlist={},{},{}
-    for row in dbcursor:
-        cuntlist[row[1]]=row[0]
-        sizelist[row[1]]=row[2]
-        hashlist[row[1]]=row[3]
-    ldgrbase.close()
-    ldgrlist=[cuntlist,sizelist,hashlist]
+    ldgrlist=[]
+    try:
+        ldgrbase=sqlite3.connect(ldgrname)
+        dbcursor=ldgrbase.execute("select * from ldgrbase")
+        hashlist,sizelist,cuntlist={},{},{}
+        for row in dbcursor:
+            cuntlist[row[1]]=row[0]
+            sizelist[row[1]]=row[2]
+            hashlist[row[1]]=row[3]
+        ldgrbase.close()
+        ldgrlist=[cuntlist,sizelist,hashlist]
+    except:
+        ldgrlist=None
     return ldgrlist
 
 def displdgr(ldgrname):
@@ -144,27 +148,34 @@ def pthealth(cuntlist,sizelist,hashlist):
 def joincunt(filename):
     ldgrname=filename+".ldg"
     ldgrlist=readldgr(ldgrname)
-    cuntlist=ldgrlist[0]
-    sizelist=ldgrlist[1]
-    hashlist=ldgrlist[2]
-    if (pthealth(cuntlist,sizelist,hashlist)):
-        print(Fore.GREEN+"Initiating join procedure..."+Style.RESET_ALL)
-        actibuff=b""
-        for i in cuntlist.keys():
-            blocfile=open(i,"rb")
-            blocbuff=blocfile.read()
-            blocfile.close()
-            os.system("rm "+i)
-            actibuff+=blocbuff
-            print("Joined "+i+" to parent file (100%)")
-        actifile=open(filename,"wb")
-        actifile.write(actibuff)
-        actifile.close()
-        os.system("rm "+ldgrname)
-        print(Fore.GREEN+"Join process successfully completed!"+Style.RESET_ALL)
+    if ldgrlist==None:
+        print(Fore.RED+"The ledger could not be read properly!"+Style.RESET_ALL+"\n"+\
+              "Make sure you have \n"+\
+              "- Privileges to access the ledger file \n"+\
+              "- the ledger file present in the directory \n"+\
+              "- been pointing towards to right location")
     else:
-        print(Fore.RED+"Join procedure could not be initiated!"+Style.RESET_ALL+"\n"+\
-              "Some parts are missing or corrupted - Download them again")
+        cuntlist=ldgrlist[0]
+        sizelist=ldgrlist[1]
+        hashlist=ldgrlist[2]
+        if (pthealth(cuntlist,sizelist,hashlist)):
+            print(Fore.GREEN+"Initiating join procedure..."+Style.RESET_ALL)
+            actibuff=b""
+            for i in cuntlist.keys():
+                blocfile=open(i,"rb")
+                blocbuff=blocfile.read()
+                blocfile.close()
+                os.system("rm "+i)
+                actibuff+=blocbuff
+                print("Joined "+i+" to parent file (100%)")
+            actifile=open(filename,"wb")
+            actifile.write(actibuff)
+            actifile.close()
+            os.system("rm "+ldgrname)
+            print(Fore.GREEN+"Join process successfully completed!"+Style.RESET_ALL)
+        else:
+            print(Fore.RED+"Join procedure could not be initiated!"+Style.RESET_ALL+"\n"+\
+                "Some parts are missing or corrupted - Download them again")
 
 def spltcunt(filename,partcunt):
     actifile=open(filename,"rb")
@@ -173,6 +184,12 @@ def spltcunt(filename,partcunt):
     poselist=allcbyte(actibuff,partcunt)
     buffsize=len(actibuff)
     hashlist,sizelist,cuntlist={},{},{}
+    print(Fore.GREEN+"PROTEXON SPLITTER [by t0xic0der]"+Style.RESET_ALL+"\n"+\
+          "File name   : "+filename+"\n"+\
+          "File size   : "+str(buffsize)+" bytes\n"+\
+          "Part count  : "+str(partcunt)+" parts\n"+\
+          "Ledger name : "+filename+".ldg\n")
+    print(Fore.GREEN+"FILE PARTS"+Style.RESET_ALL)
     if partcunt>10 and partcunt<100:
         for i in range(1,partcunt+1):
             blocname=filename+"."+nogenten(i)
@@ -183,6 +200,7 @@ def spltcunt(filename,partcunt):
             blocfile=open(blocname,"wb")
             blocfile.write(blocbuff)
             blocfile.close()
+            print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+str(sizelist[blocname])+" bytes\t"+str(hashlist[blocname]))
     elif partcunt>100 and partcunt<1000:
         for i in range(1,partcunt+1):
             blocname=filename+"."+nogenhun(i)
@@ -193,15 +211,12 @@ def spltcunt(filename,partcunt):
             blocfile=open(blocname,"wb")
             blocfile.write(blocbuff)
             blocfile.close()
+            print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+str(sizelist[blocname])+" bytes\t"+str(hashlist[blocname]))
     elif partcunt>=1000:
         print("Parts count greater than or equal to 1000 is not recommended!")
         exit()
-    print(Fore.GREEN+"PROTEXON SPLITTER [by t0xic0der]"+Style.RESET_ALL+"\n"+\
-          "File name   : "+filename+"\n"+\
-          "File size   : "+str(buffsize)+" bytes\n"+\
-          "Part count  : "+str(partcunt)+" parts\n"+\
-          "Ledger name : "+filename+".ldg\n")
     makeldgr(filename,hashlist,sizelist,cuntlist)
-    print(Fore.GREEN+"FILE PARTS"+Style.RESET_ALL)
+    '''
     for i in hashlist.keys():
         print(str(cuntlist[i])+"\t"+str(i)+"\t\t"+str(sizelist[i])+" bytes\t"+str(hashlist[i]))
+    '''

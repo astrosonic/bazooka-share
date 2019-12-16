@@ -33,3 +33,4 @@ Node-based shared network protocol emphasizing on security and decentralization
 5. Fixed issue when requested file for splitting was not found
 6. Fixed issue when requested ledger for joining was not found
 7. Refactored code for optimised calculation
+8. Added percentage progress display for joining/splitting

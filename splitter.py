@@ -1,5 +1,5 @@
 import hashlib, sqlite3, os
-from colorama import init, Fore, Style
+from colorama import init, Fore
 init()
 
 def nogenten(numvalue):
@@ -15,6 +15,18 @@ def nogenhun(numvalue):
     if numvalue<10:
         strvalue="00"+str(numvalue)
     elif numvalue>=10 and numvalue<100:
+        strvalue="0"+str(numvalue)
+    else:
+        strvalue=str(numvalue)
+    return strvalue
+
+def nogenthd(numvalue):
+    strvalue=""
+    if numvalue<10:
+        strvalue="000"+str(numvalue)
+    elif numvalue>=10 and numvalue<100:
+        strvalue="00"+str(numvalue)
+    elif numvalue>=100 and numvalue<1000:
         strvalue="0"+str(numvalue)
     else:
         strvalue=str(numvalue)
@@ -136,8 +148,8 @@ def pthealth(cuntlist,sizelist,hashlist):
     joinable=False
     if chekcunt==passcunt:
         joinable=True
-    print(Fore.GREEN+"File health check has been performed"+"\n"+
-          Style.RESET_ALL+\
+    print(Fore.CYAN+"File health check has been performed"+"\n"+
+          Fore.RESET+\
           "Total checks          : "+str(chekcunt)+"\n"+\
           "Files with wrong hash : "+str(failcunt)+"\n"+\
           "Files with match hash : "+str(passcunt)+"\n"+\
@@ -149,7 +161,7 @@ def joincunt(filename):
     ldgrname=filename+".ldg"
     ldgrlist=readldgr(ldgrname)
     if ldgrlist==None:
-        print(Fore.RED+"The ledger could not be read properly!"+Style.RESET_ALL+"\n"+\
+        print(Fore.RED+"The ledger could not be read properly!"+Fore.RESET+"\n"+\
               "Make sure you have \n"+\
               "- Privileges to access the ledger file \n"+\
               "- the ledger file present in the directory \n"+\
@@ -159,7 +171,7 @@ def joincunt(filename):
         sizelist=ldgrlist[1]
         hashlist=ldgrlist[2]
         if (pthealth(cuntlist,sizelist,hashlist)):
-            print(Fore.GREEN+"Initiating join procedure..."+Style.RESET_ALL)
+            print(Fore.CYAN+"Initiating join procedure..."+Fore.RESET)
             actibuff=b""
             for i in cuntlist.keys():
                 blocfile=open(i,"rb")
@@ -172,56 +184,76 @@ def joincunt(filename):
             actifile.write(actibuff)
             actifile.close()
             os.system("rm "+ldgrname)
-            print(Fore.GREEN+"Join process successfully completed!"+Style.RESET_ALL)
+            print(Fore.CYAN+"Join process successfully completed!"+Fore.RESET)
         else:
-            print(Fore.RED+"Join procedure could not be initiated!"+Style.RESET_ALL+"\n"+\
+            print(Fore.RED+"Join procedure could not be initiated!"+Fore.RESET+"\n"+\
                 "Some parts are missing or corrupted - Download them again")
 
 def spltcunt(filename,partcunt):
     try:
         actifile=open(filename,"rb")
         actibuff=actifile.read()
-        actifile.close()
-        poselist=allcbyte(actibuff,partcunt)
         buffsize=len(actibuff)
-        hashlist,sizelist,cuntlist={},{},{}
-        print(Fore.GREEN+"PROTEXON SPLITTER [by t0xic0der]"+Style.RESET_ALL+"\n"+\
-            "File name   : "+filename+"\n"+\
-            "File size   : "+str(buffsize)+" bytes\n"+\
-            "Part count  : "+str(partcunt)+" parts\n"+\
-            "Ledger name : "+filename+".ldg\n")
-        if partcunt>=10 and partcunt<=100:
-            print(Fore.GREEN+"FILE PARTS"+Style.RESET_ALL)
-            for i in range(1,partcunt+1):
-                blocname=filename+"."+nogenten(i)
-                blocbuff=actibuff[poselist[i-1]:poselist[i]]
-                hashlist[blocname]=hashlib.sha512(blocbuff).hexdigest()
-                sizelist[blocname]=len(blocbuff)
-                cuntlist[blocname]=nogenten(i)
-                blocfile=open(blocname,"wb")
-                blocfile.write(blocbuff)
-                blocfile.close()
-                print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+str(sizelist[blocname])+" bytes\t"+str(hashlist[blocname]))
-            makeldgr(filename,hashlist,sizelist,cuntlist)
-            print(Fore.GREEN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Style.RESET_ALL)
-        elif partcunt>100 and partcunt<1000:
-            print(Fore.GREEN+"FILE PARTS"+Style.RESET_ALL)
-            for i in range(1,partcunt+1):
-                blocname=filename+"."+nogenhun(i)
-                blocbuff=actibuff[poselist[i-1]:poselist[i]]
-                hashlist[blocname]=hashlib.sha512(blocbuff).hexdigest()
-                sizelist[blocname]=len(blocbuff)
-                cuntlist[blocname]=nogenhun(i)
-                blocfile=open(blocname,"wb")
-                blocfile.write(blocbuff)
-                blocfile.close()
-                print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+str(sizelist[blocname])+" bytes\t"+str(hashlist[blocname]))
-            makeldgr(filename,hashlist,sizelist,cuntlist)
-            print(Fore.GREEN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Style.RESET_ALL)
-        elif partcunt>=1000 or partcunt<10:
-            print(Fore.RED+"Parts count greater than or equal to 1000 or lesser than or equal to 10 is not recommended!"+Style.RESET_ALL)
+        actifile.close()
+        if (partcunt>=10 and partcunt<10000):
+            if (partcunt>buffsize):
+                print(Fore.RED+"Splitting operation could not be initiated!"+Fore.RESET+"\n"+\
+                      "The number of parts is greater than the byte size of your file")
+            else:
+                poselist=allcbyte(actibuff,partcunt)
+                hashlist,sizelist,cuntlist={},{},{}
+                print(Fore.CYAN+"PROTEXON SPLITTER [by t0xic0der]"+Fore.RESET+"\n"+\
+                    "File name   : "+filename+"\n"+\
+                    "File size   : "+str(buffsize)+" bytes\n"+\
+                    "Part count  : "+str(partcunt)+" parts\n"+\
+                    "Ledger name : "+filename+".ldg\n")
+                if partcunt>=10 and partcunt<=100:
+                    print(Fore.CYAN+"FILE PARTS"+Fore.RESET)
+                    for i in range(1,partcunt+1):
+                        blocname=filename+"."+nogenten(i)
+                        blocbuff=actibuff[poselist[i-1]:poselist[i]]
+                        hashlist[blocname]=hashlib.sha512(blocbuff).hexdigest()
+                        sizelist[blocname]=len(blocbuff)
+                        cuntlist[blocname]=nogenten(i)
+                        blocfile=open(blocname,"wb")
+                        blocfile.write(blocbuff)
+                        blocfile.close()
+                        print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+str(sizelist[blocname])+" bytes\t"+str(hashlist[blocname]))
+                    makeldgr(filename,hashlist,sizelist,cuntlist)
+                    print(Fore.CYAN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Fore.RESET)
+                elif partcunt>=100 and partcunt<=1000:
+                    print(Fore.CYAN+"FILE PARTS"+Fore.RESET)
+                    for i in range(1,partcunt+1):
+                        blocname=filename+"."+nogenhun(i)
+                        blocbuff=actibuff[poselist[i-1]:poselist[i]]
+                        hashlist[blocname]=hashlib.sha512(blocbuff).hexdigest()
+                        sizelist[blocname]=len(blocbuff)
+                        cuntlist[blocname]=nogenhun(i)
+                        blocfile=open(blocname,"wb")
+                        blocfile.write(blocbuff)
+                        blocfile.close()
+                        print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+str(sizelist[blocname])+" bytes\t"+str(hashlist[blocname]))
+                    makeldgr(filename,hashlist,sizelist,cuntlist)
+                    print(Fore.CYAN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Fore.RESET)
+                elif partcunt>=1000 and partcunt<10000:
+                    print(Fore.CYAN+"FILE PARTS"+Fore.RESET)
+                    for i in range(1,partcunt+1):
+                        blocname=filename+"."+nogenthd(i)
+                        blocbuff=actibuff[poselist[i-1]:poselist[i]]
+                        hashlist[blocname]=hashlib.sha512(blocbuff).hexdigest()
+                        sizelist[blocname]=len(blocbuff)
+                        cuntlist[blocname]=nogenthd(i)
+                        blocfile=open(blocname,"wb")
+                        blocfile.write(blocbuff)
+                        blocfile.close()
+                        print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+str(sizelist[blocname])+" bytes\t"+str(hashlist[blocname]))
+                    makeldgr(filename,hashlist,sizelist,cuntlist)
+                    print(Fore.CYAN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Fore.RESET)
+        else:
+            print(Fore.RED+"Splitting operation could not be initiated!"+Fore.RESET+"\n"+\
+                  "Splitting the file in this many parts is not at all recommended")
     except FileNotFoundError:
-        print(Fore.RED+"Splitting operation could not be initiated!"+Style.RESET_ALL+"\n"+\
+        print(Fore.RED+"Splitting operation could not be initiated!"+Fore.RESET+"\n"+\
               "The requested file is not accessible. Make sure that - \n"+\
               "- You have sufficient privileges to the directory \n"+
               "- The path you have provided is correct \n"+

@@ -5,7 +5,6 @@ Node-based shared network protocol with an emphasis on security and decentraliza
 
 ### Under development
 
-
 ## File Archive Dispersal and Encryption (FADE)
 
 ### Changelog
@@ -25,3 +24,12 @@ Node-based shared network protocol with an emphasis on security and decentraliza
 5. Joining of files when health checkup returns positive
 6. Uses `os` for ledger and block deletion from system
 7. Automatic removal of ledger and blocks when joining complete
+
+### v0.03 [Oncoming]
+1. Switched default accent from GREEN to CYAN
+2. Fragment capacity increased to 9999 blocks - Going beyond is stupid
+3. Fixed issue when block count greater than byte size was accepted
+4. Fixed issue when block count equal to 100 was not accepted
+5. Fixed issue when requested file for splitting was not found
+6. Fixed issue when requested ledger for joining was not found
+7. Refactored code for optimised calculation

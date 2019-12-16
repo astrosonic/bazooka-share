@@ -1,7 +1,11 @@
 # protexon v0.02
 Node-based shared network protocol with an emphasis on security and decentralization
 
-## Changelog
+## Decentralised Union of Connected Environments (DUCE)
+### Under development
+
+## File Archive Dispersal and Encryption (FADE)
+### Changelog
 
 ### v0.01
 1. Dynamic file naming based on number of split parts

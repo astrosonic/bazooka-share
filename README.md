@@ -1,5 +1,5 @@
-# protexon v0.02
-Node-based shared network protocol with an emphasis on security and decentralization
+# protexon v0.03
+Node-based shared network protocol emphasizing on security and decentralization
 
 ## Decentralised Union of Connected Environments (DUCE)
 

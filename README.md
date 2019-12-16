@@ -2,9 +2,12 @@
 Node-based shared network protocol with an emphasis on security and decentralization
 
 ## Decentralised Union of Connected Environments (DUCE)
+
 ### Under development
 
+
 ## File Archive Dispersal and Encryption (FADE)
+
 ### Changelog
 
 ### v0.01

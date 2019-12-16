@@ -1,5 +1,5 @@
 import hashlib, sqlite3, os
-from colorama import init, Fore
+from colorama import init, Fore, Style
 init()
 
 def nogenten(numvalue):
@@ -170,6 +170,8 @@ def joincunt(filename):
         cuntlist=ldgrlist[0]
         sizelist=ldgrlist[1]
         hashlist=ldgrlist[2]
+        totlpart=int(list(cuntlist.values())[-1])
+        totlprog=0
         if (pthealth(cuntlist,sizelist,hashlist)):
             print(Fore.CYAN+"Initiating join procedure..."+Fore.RESET)
             actibuff=b""
@@ -179,7 +181,8 @@ def joincunt(filename):
                 blocfile.close()
                 os.system("rm "+i)
                 actibuff+=blocbuff
-                print("Joined "+i+" to parent file (100%)")
+                totlprog=totlprog+100/totlpart
+                print("Joined "+i+" to parent file "+Style.DIM+"("+str(totlprog)[0:4]+"% completed)"+Style.RESET_ALL)
             actifile=open(filename,"wb")
             actifile.write(actibuff)
             actifile.close()
@@ -202,6 +205,7 @@ def spltcunt(filename,partcunt):
             else:
                 poselist=allcbyte(actibuff,partcunt)
                 hashlist,sizelist,cuntlist={},{},{}
+                totlprog=0
                 print(Fore.CYAN+"PROTEXON SPLITTER [by t0xic0der]"+Fore.RESET+"\n"+\
                     "File name   : "+filename+"\n"+\
                     "File size   : "+str(buffsize)+" bytes\n"+\
@@ -218,7 +222,8 @@ def spltcunt(filename,partcunt):
                         blocfile=open(blocname,"wb")
                         blocfile.write(blocbuff)
                         blocfile.close()
-                        print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+str(sizelist[blocname])+" bytes\t"+str(hashlist[blocname]))
+                        totlprog=totlprog+(100/partcunt)
+                        print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+Style.DIM+str(sizelist[blocname])+" bytes\t"+Style.RESET_ALL+str(hashlist[blocname])+"\t"+Style.DIM+str(totlprog)[0:4]+"% completed"+Style.RESET_ALL)
                     makeldgr(filename,hashlist,sizelist,cuntlist)
                     print(Fore.CYAN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Fore.RESET)
                 elif partcunt>=100 and partcunt<=1000:
@@ -232,7 +237,8 @@ def spltcunt(filename,partcunt):
                         blocfile=open(blocname,"wb")
                         blocfile.write(blocbuff)
                         blocfile.close()
-                        print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+str(sizelist[blocname])+" bytes\t"+str(hashlist[blocname]))
+                        totlprog=totlprog+(100/partcunt)
+                        print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+Style.DIM+str(sizelist[blocname])+" bytes\t"+Style.RESET_ALL+str(hashlist[blocname])+"\t"+Style.DIM+str(totlprog)[0:4]+"% completed"+Style.RESET_ALL)
                     makeldgr(filename,hashlist,sizelist,cuntlist)
                     print(Fore.CYAN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Fore.RESET)
                 elif partcunt>=1000 and partcunt<10000:
@@ -246,7 +252,8 @@ def spltcunt(filename,partcunt):
                         blocfile=open(blocname,"wb")
                         blocfile.write(blocbuff)
                         blocfile.close()
-                        print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+str(sizelist[blocname])+" bytes\t"+str(hashlist[blocname]))
+                        totlprog=totlprog+(100/partcunt)
+                        print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+Style.DIM+str(sizelist[blocname])+" bytes\t"+Style.RESET_ALL+str(hashlist[blocname])+"\t"+Style.DIM+str(totlprog)[0:4]+"% completed"+Style.RESET_ALL)
                     makeldgr(filename,hashlist,sizelist,cuntlist)
                     print(Fore.CYAN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Fore.RESET)
         else:

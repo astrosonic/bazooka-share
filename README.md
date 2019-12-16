@@ -1,5 +1,5 @@
 # protexon v0.02
-Network file splitting, encryption and sharing protocol
+Node-based shared network protocol with an emphasis on security and decentralization
 
 ## Changelog
 

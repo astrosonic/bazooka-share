@@ -39,3 +39,4 @@ Node-based shared network protocol emphasizing on security and decentralization
 1. Reduced visibility of progress percentage and block size
 2. Disposed off allocation by size in favour of allocation by count
 3. Ledger display invokable by filename - ledger name not needed
+4. Added timer for long thread operations

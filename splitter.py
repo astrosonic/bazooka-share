@@ -1,4 +1,4 @@
-import hashlib, sqlite3, os
+import hashlib, sqlite3, os, time
 from colorama import init, Fore, Style
 init()
 
@@ -102,6 +102,7 @@ def displdgr(filename):
     ldgrbase=sqlite3.connect(ldgrname)
     dbcursor=ldgrbase.execute("select * from ldgrbase")
     hashlist,sizelist,cuntlist={},{},{}
+    print(Fore.CYAN+"[LEDGER CONTENTS]"+Fore.RESET)
     for row in dbcursor:
         print("Part count  : "+str(row[0])+"\n"+\
               "Part name   : "+str(row[1])+"\n"+\
@@ -112,6 +113,7 @@ def displdgr(filename):
 def pthealth(cuntlist,sizelist,hashlist):
     failcunt,passcunt=0,0
     chekcunt,misscunt=0,0
+    startsec=time.time()
     for i in cuntlist.keys():
         chekcunt+=1
         try:
@@ -125,23 +127,26 @@ def pthealth(cuntlist,sizelist,hashlist):
                 failcunt+=1
         except FileNotFoundError:
             misscunt+=1
+    endinsec=time.time()
+    totatime=str(endinsec-startsec).split(".")[0]+"."+str(endinsec-startsec).split(".")[1][0:2]
     joinable=False
     if chekcunt==passcunt:
         joinable=True
-    print(Fore.CYAN+"File health check has been performed"+"\n"+
-          Fore.RESET+\
+    print(Fore.CYAN+"[BLOCK INTEGRITY CHECK]"+"\n"+Fore.RESET+\
           "Total checks          : "+str(chekcunt)+"\n"+\
           "Files with wrong hash : "+str(failcunt)+"\n"+\
           "Files with match hash : "+str(passcunt)+"\n"+\
           "Files missing         : "+str(misscunt)+"\n"+\
-          "Health result         : "+str(joinable)+"\n")
+          "Time taken for check  : "+str(totatime)+" seconds\n"+\
+          "Integrity result      : "+str(joinable)+"\n")
     return joinable
 
 def joincunt(filename):
     ldgrname=filename+".ldg"
     ldgrlist=readldgr(ldgrname)
     if ldgrlist==None:
-        print(Fore.RED+"The ledger could not be read properly!"+Fore.RESET+"\n"+\
+        print(Fore.RED+"[ERROR OCCURRED]"+Fore.RESET+"\n"+\
+              "The ledger could not be read properly!\n"+\
               "Make sure you have \n"+\
               "- Privileges to access the ledger file \n"+\
               "- the ledger file present in the directory \n"+\
@@ -153,7 +158,8 @@ def joincunt(filename):
         totlpart=int(list(cuntlist.values())[-1])
         totlprog=0
         if (pthealth(cuntlist,sizelist,hashlist)):
-            print(Fore.CYAN+"Initiating join procedure..."+Fore.RESET)
+            print(Fore.CYAN+"[STARTING JOIN OPERATION]"+Fore.RESET)
+            startsec=time.time()
             actibuff=b""
             for i in cuntlist.keys():
                 blocfile=open(i,"rb")
@@ -167,10 +173,14 @@ def joincunt(filename):
             actifile.write(actibuff)
             actifile.close()
             os.system("rm "+ldgrname)
-            print(Fore.CYAN+"Join process successfully completed!"+Fore.RESET)
+            endinsec=time.time()
+            totatime=str(endinsec-startsec).split(".")[0]+"."+str(endinsec-startsec).split(".")[1][0:2]
+            print("\n"+Fore.CYAN+"[JOIN OPERATION COMPLETED]"+Fore.RESET+"\n"+\
+                  "Time taken : "+totatime+" seconds"+Fore.RESET)
         else:
-            print(Fore.RED+"Join procedure could not be initiated!"+Fore.RESET+"\n"+\
-                "Some parts are missing or corrupted - Download them again")
+            print("\n"+Fore.RED+"[ERROR OCCURRED]"+Fore.RESET+"\n"+\
+                  "Join procedure could not be initiated!\n"+\
+                  "Some parts are missing or corrupted - Download them again")
 
 def spltcunt(filename,partcunt):
     try:
@@ -180,19 +190,21 @@ def spltcunt(filename,partcunt):
         actifile.close()
         if (partcunt>=10 and partcunt<10000):
             if (partcunt>buffsize):
-                print(Fore.RED+"Splitting operation could not be initiated!"+Fore.RESET+"\n"+\
+                print(Fore.RED+"[ERROR OCCURRED]"+Fore.RESET+"\n"+\
+                      "Splitting operation could not be initiated!\n"+\
                       "The number of parts is greater than the byte size of your file")
             else:
                 poselist=allcbyte(actibuff,partcunt)
                 hashlist,sizelist,cuntlist={},{},{}
                 totlprog=0
-                print(Fore.CYAN+"PROTEXON SPLITTER [by t0xic0der]"+Fore.RESET+"\n"+\
+                print(Fore.CYAN+"[PROTEXON SPLITTER by t0xic0der]"+Fore.RESET+"\n"+\
                     "File name   : "+filename+"\n"+\
                     "File size   : "+str(buffsize)+" bytes\n"+\
                     "Part count  : "+str(partcunt)+" parts\n"+\
                     "Ledger name : "+filename+".ldg\n")
                 if partcunt>=10 and partcunt<=100:
-                    print(Fore.CYAN+"FILE PARTS"+Fore.RESET)
+                    print(Fore.CYAN+"[STARTING SPLIT OPERATION]"+Fore.RESET)
+                    startsec=time.time()
                     for i in range(1,partcunt+1):
                         blocname=filename+"."+nogenten(i)
                         blocbuff=actibuff[poselist[i-1]:poselist[i]]
@@ -205,9 +217,15 @@ def spltcunt(filename,partcunt):
                         totlprog=totlprog+(100/partcunt)
                         print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+Style.DIM+str(sizelist[blocname])+" bytes\t"+Style.RESET_ALL+str(hashlist[blocname])+"\t"+Style.DIM+str(totlprog)[0:4]+"% completed"+Style.RESET_ALL)
                     makeldgr(filename,hashlist,sizelist,cuntlist)
-                    print(Fore.CYAN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Fore.RESET)
+                    endinsec=time.time()
+                    totatime=str(endinsec-startsec).split(".")[0]+"."+str(endinsec-startsec).split(".")[1][0:2]
+                    print("\n"+Fore.CYAN+"[SPLIT OPERATION COMPLETED]"+Fore.RESET+"\n"+\
+                          "Parts created  : "+str(partcunt)+" parts \n"+\
+                          "Ledger created : "+str(filename)+".ldg \n"+\
+                          "Time taken     : "+str(totatime)+" seconds \n")
                 elif partcunt>=100 and partcunt<=1000:
-                    print(Fore.CYAN+"FILE PARTS"+Fore.RESET)
+                    print(Fore.CYAN+"[STARTING SPLIT OPERATION]"+Fore.RESET)
+                    startsec=time.time()
                     for i in range(1,partcunt+1):
                         blocname=filename+"."+nogenhun(i)
                         blocbuff=actibuff[poselist[i-1]:poselist[i]]
@@ -220,9 +238,15 @@ def spltcunt(filename,partcunt):
                         totlprog=totlprog+(100/partcunt)
                         print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+Style.DIM+str(sizelist[blocname])+" bytes\t"+Style.RESET_ALL+str(hashlist[blocname])+"\t"+Style.DIM+str(totlprog)[0:4]+"% completed"+Style.RESET_ALL)
                     makeldgr(filename,hashlist,sizelist,cuntlist)
-                    print(Fore.CYAN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Fore.RESET)
+                    endinsec=time.time()
+                    totatime=str(endinsec-startsec).split(".")[0]+"."+str(endinsec-startsec).split(".")[1][0:2]
+                    print("\n"+Fore.CYAN+"[SPLIT OPERATION COMPLETED]"+Fore.RESET+"\n"+\
+                          "Parts created  : "+str(partcunt)+" parts \n"+\
+                          "Ledger created : "+str(filename)+".ldg \n"+\
+                          "Time taken     : "+str(totatime)+" seconds \n")
                 elif partcunt>=1000 and partcunt<10000:
-                    print(Fore.CYAN+"FILE PARTS"+Fore.RESET)
+                    print(Fore.CYAN+"[STARTING SPLIT OPERATION]"+Fore.RESET)
+                    startsec=time.time()
                     for i in range(1,partcunt+1):
                         blocname=filename+"."+nogenthd(i)
                         blocbuff=actibuff[poselist[i-1]:poselist[i]]
@@ -235,12 +259,19 @@ def spltcunt(filename,partcunt):
                         totlprog=totlprog+(100/partcunt)
                         print(str(cuntlist[blocname])+"\t"+str(blocname)+ " created!\t"+Style.DIM+str(sizelist[blocname])+" bytes\t"+Style.RESET_ALL+str(hashlist[blocname])+"\t"+Style.DIM+str(totlprog)[0:4]+"% completed"+Style.RESET_ALL)
                     makeldgr(filename,hashlist,sizelist,cuntlist)
-                    print(Fore.CYAN+str(partcunt)+" parts have been created successfully! Ledger was created at "+filename+".ldg"+Fore.RESET)
+                    endinsec=time.time()
+                    totatime=str(endinsec-startsec).split(".")[0]+"."+str(endinsec-startsec).split(".")[1][0:2]
+                    print("\n"+Fore.CYAN+"[SPLIT OPERATION COMPLETED]"+Fore.RESET+"\n"+\
+                          "Parts created  : "+str(partcunt)+" parts \n"+\
+                          "Ledger created : "+str(filename)+".ldg \n"+\
+                          "Time taken     : "+str(totatime)+" seconds \n")
         else:
-            print(Fore.RED+"Splitting operation could not be initiated!"+Fore.RESET+"\n"+\
-                  "Splitting the file in this many parts is not at all recommended")
+            print(Fore.RED+"[ERROR OCCURRED]"+Fore.RESET+"\n"+\
+                  "Splitting operation could not be initiated!\n"+\
+                  "We do not recommend splitting in this many parts")
     except FileNotFoundError:
-        print(Fore.RED+"Splitting operation could not be initiated!"+Fore.RESET+"\n"+\
+        print(Fore.RED+"[ERROR OCCURRED]"+Fore.RESET+"\n"+\
+              "Splitting operation could not be initiated!\n"+\
               "The requested file is not accessible. Make sure that - \n"+\
               "- You have sufficient privileges to the directory \n"+
               "- The path you have provided is correct \n"+

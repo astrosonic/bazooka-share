@@ -32,27 +32,6 @@ def nogenthd(numvalue):
         strvalue=str(numvalue)
     return strvalue
 
-def allcsize(filename,partcunt):
-    actifile=open(filename,"rb")
-    actibuff=actifile.read()
-    actifile.close()
-    filesize=len(actibuff)
-    sizelist,poselist=[],[]
-    if filesize%partcunt==0:
-        genptsiz=filesize//partcunt
-        for i in range(0,partcunt):
-            sizelist.append(genptsiz)
-    else:
-        genptsiz=filesize//partcunt
-        endptsiz=filesize%partcunt
-        sizelist.append(genptsiz+endptsiz)
-        for i in range(0,partcunt-1):
-            sizelist.append(genptsiz)
-    poselist.append(0)
-    for i in range(1,partcunt+1):
-        poselist.append(sum(sizelist[0:i]))
-    return poselist
-
 def allcbyte(bytename,partcunt):
     buffsize=len(bytename)
     sizelist,poselist=[],[]
@@ -118,7 +97,8 @@ def readldgr(ldgrname):
         ldgrlist=None
     return ldgrlist
 
-def displdgr(ldgrname):
+def displdgr(filename):
+    ldgrname=filename+".ldg"
     ldgrbase=sqlite3.connect(ldgrname)
     dbcursor=ldgrbase.execute("select * from ldgrbase")
     hashlist,sizelist,cuntlist={},{},{}

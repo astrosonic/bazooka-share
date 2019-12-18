@@ -1,31 +1,3 @@
-# SPLITTER WITH CLASSES
-# Dec 18, 2019 [20:33 IST]
-
-'''
-Advantages :
-1. Better object implementation
-2. Better collection and dispersal of useless variables
-3. Better out of memory exception handling
-
-Disadvantages :
-1. Slightly slower than the actual implementation
-2. Requires a driver script for invoking functions
-3. Cannot run from the get-go with basic imports
-
-Changes :
-1. Removed splitting by size function
-2. Read Ledger function disposed off in favour of intrinsic init call
-3. Reduced overhead due to reading ledger only once for 
-    3.1. Displaying audit
-    3.2. Block integrity check
-    3.3. Reading from file
-4. Removed ledger list metadata in favour of a set of three class variables
-5. Reduced split function to one-third of instruction length
-
-Bugs
-1. New instance of join model needs to be created on joining every new ledger
-'''
-
 import hashlib, sqlite3, os, time
 from colorama import init, Fore, Style
 init()

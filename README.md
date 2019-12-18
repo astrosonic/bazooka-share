@@ -45,7 +45,8 @@ Node-based shared network protocol emphasizing on security and decentralization
 3. Ledger display invokable by filename - ledger name not needed
 4. Added timer for long thread operations
 5. End-of-life for function-only based implementation (aka FADE Legacy)
-_Only bug fixes for existing features would be provided for FADE Legacy. No new features would be implemented. It is highly recommended to move on to the class based implementation v0.05 (aka FADE Modern)._
+
+__Note__ : Only bug fixes for existing features would be provided for FADE Legacy. No new features would be implemented. It is highly recommended to move on to a faster class based implementation v0.05 (aka FADE Modern).
 
 ### v0.05 [Oncoming]
 #### FADE Modern

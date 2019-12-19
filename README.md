@@ -55,9 +55,7 @@ __Note__ : Only bug fixes for existing features would be provided for FADE Legac
 3. Deprecated allocation by size function was removed
 4. Disposed off ledger read function in favour of internal constructor
 5. Block collection health checkup is now Block Integrity Check
-6. Reduced overhead due to minimal disk reads. Following operations are faster - 
-6.1. Displaying ledger audits
-6.2. Block integrity check operations
+6. Reduced overhead due to minimal disk reads. Following operations are faster - displaying ledger audits or block integrity check operations
 7. Removed ledger list metadata in favour of a set of class-wide variables
 8. Reduced split operation to one-third of the original instruction length
 9. Efficient memory utilization with dynamic objects

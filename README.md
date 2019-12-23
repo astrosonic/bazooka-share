@@ -1,4 +1,4 @@
-# protexon v0.04
+# protexon v0.05
 Node-based shared network protocol emphasizing on security and decentralization
 
 ## Decentralised Union of Connected Environments (DUCE)
@@ -38,7 +38,7 @@ Node-based shared network protocol emphasizing on security and decentralization
 7. Refactored code for optimised calculation
 8. Added percentage progress display for joining/splitting
 
-### v0.04 [Current]
+### v0.04
 #### FADE Legacy (Deprecated)
 1. Reduced visibility of progress percentage and block size
 2. Disposed off allocation by size in favour of allocation by count
@@ -48,7 +48,7 @@ Node-based shared network protocol emphasizing on security and decentralization
 
 __Note__ : Only bug fixes for existing features would be provided for FADE Legacy. No new features would be implemented. It is highly recommended to move on to a faster class based implementation v0.05 (aka FADE Modern).
 
-### v0.05 [Oncoming]
+### v0.05 [Current]
 #### FADE Modern
 1. Fast and optimised object-based implementation
 2. Better memory address exception handling
@@ -59,3 +59,11 @@ __Note__ : Only bug fixes for existing features would be provided for FADE Legac
 7. Removed ledger list metadata in favour of a set of class-wide variables
 8. Reduced split operation to one-third of the original instruction length
 9. Efficient memory utilization with dynamic objects
+
+### v0.06 [Oncoming]
+#### FADE Modern
+1. Fixed issue of arbitration of two same named functions in a class
+2. Fixed issue of joining when non-existent ledger was referenced
+3. Added back splitting and joining by size
+4. Introduced two types of ledgers - Split by Count (SBC) and Split by Size (SBS)
+5. Fixed invalid reference to join class when ledger was invalid or corrupt

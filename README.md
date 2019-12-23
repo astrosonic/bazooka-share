@@ -67,3 +67,4 @@ __Note__ : Only bug fixes for existing features would be provided for FADE Legac
 3. Added back splitting and joining by size
 4. Introduced two types of ledgers - Split by Count (SBC) and Split by Size (SBS)
 5. Fixed invalid reference to join class when ledger was invalid or corrupt
+6. Split by size limit is between 1MB to 8MB block size

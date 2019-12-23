@@ -1,5 +1,6 @@
 import hashlib, sqlite3, os, time
 from colorama import init, Fore, Style
+
 init()
 
 class splmodel:
@@ -48,6 +49,25 @@ class splmodel:
             strvalue = str(numvalue)
         return strvalue
 
+    def allcsize(self,partsize):
+        sizelist, poselist = [], []
+        partcunt = self.buffsize // partsize
+        poselist.append(0)
+        if self.buffsize % partsize == 0:
+            genptsiz = self.buffsize // partcunt
+            for i in range(0, partcunt):
+                sizelist.append(genptsiz)
+        else:
+            genptsiz = self.buffsize // partcunt
+            endptsiz = self.buffsize % partcunt
+            for i in range(0, partcunt):
+                sizelist.append(genptsiz)
+            sizelist.append(endptsiz)
+            partcunt+=1
+        for i in range(1, partcunt+1):
+            poselist.append(sum(sizelist[0:i]))
+        return partcunt, poselist
+
     def allcbyte(self,partcunt):
         sizelist, poselist = [], []
         if self.buffsize % partcunt == 0:
@@ -65,8 +85,8 @@ class splmodel:
             poselist.append(sum(sizelist[0:i]))
         return poselist
 
-    def makeldgr(self, hashlist, sizelist, cuntlist):
-        ldgrname = self.filename + ".sbc"
+    def makeldgr(self, hashlist, sizelist, cuntlist, typesplt):
+        ldgrname = self.filename + typesplt
         actifile = open(ldgrname, "wb")
         actifile.close()
         ldgrbase = sqlite3.connect(ldgrname)
@@ -84,7 +104,58 @@ class splmodel:
         ldgrbase.close()
 
     def spltsize(self,partsize):
-        pass
+        if partsize >= 1 and partsize < 8:
+            partsize = partsize * 1048576
+            if partsize > self.buffsize:
+                print(Fore.RED + "[ERROR OCCURRED]" + Fore.RESET + "\n" + \
+                      "Splitting operation could not be initiated!\n" + \
+                      "The size per block is greater than the byte size of your file")
+            else:
+                partcunt = self.allcsize(partsize)[0]
+                poselist = self.allcsize(partsize)[1]
+                hashlist, sizelist, cuntlist = {}, {}, {}
+                totlprog = 0
+                print(Fore.CYAN + "[PROTEXON SPLITTER by t0xic0der]" + Fore.RESET + "\n" + \
+                      "File name   : " + self.filename + "\n" + \
+                      "File size   : " + str(self.buffsize) + " bytes\n" + \
+                      "Block size  : " + str(partsize) + " bytes\n" + \
+                      "Ledger name : " + self.filename + ".sbs\n")
+                print(Fore.CYAN + "[STARTING SPLIT OPERATION]" + Fore.RESET)
+                startsec = time.time()
+                for i in range(1, partcunt + 1):
+                    if partcunt >= 10 and partcunt <= 100:
+                        blocname = self.filename + "." + self.nogenten(i)
+                        cuntlist[blocname] = self.nogenten(i)
+                    elif partcunt >= 100 and partcunt <= 1000:
+                        blocname = self.filename + "." + self.nogenhun(i)
+                        cuntlist[blocname] = self.nogenhun(i)
+                    elif partcunt >= 1000 and partcunt < 10000:
+                        blocname = self.filename + "." + self.nogenthd(i)
+                        cuntlist[blocname] = self.nogenthd(i)
+                    blocbuff = self.actibuff[poselist[i - 1]:poselist[i]]
+                    hashlist[blocname] = hashlib.sha512(blocbuff).hexdigest()
+                    sizelist[blocname] = len(blocbuff)
+                    blocfile = open(blocname, "wb")
+                    blocfile.write(blocbuff)
+                    blocfile.close()
+                    del(blocbuff)
+                    totlprog = totlprog + (100 / partcunt)
+                    print(str(cuntlist[blocname]) + "\t"+  str(hashlist[blocname]) + "\t" + Style.DIM + \
+                          str(totlprog)[0:4] + "% completed" + Style.RESET_ALL + "\t" + Style.DIM + \
+                          str(sizelist[blocname]) + " bytes\t" + Style.RESET_ALL)
+                self.makeldgr(hashlist, sizelist, cuntlist, ".sbs")
+                endinsec = time.time()
+                totatime = str(endinsec - startsec).split(".")[0] + "." + str(endinsec - startsec).split(".")[1][0:2]
+                del(self.actibuff)
+                print("\n" + Fore.CYAN + "[SPLIT OPERATION COMPLETED]" + Fore.RESET + "\n" + \
+                      "Parts created  : " + str(partcunt) + " parts \n" + \
+                      "Block size     : " + str(partsize) + " bytes \n" + \
+                      "Ledger created : " + str(self.filename) + ".sbs \n" + \
+                      "Time taken     : " + str(totatime) + " seconds \n")
+        else:
+            print(Fore.RED + "[ERROR OCCURRED]" + Fore.RESET + "\n" + \
+                  "Splitting operation could not be initiated!\n" + \
+                  "We do not recommend splitting into blocks of this size")
 
     def spltcunt(self,partcunt):
         if partcunt >= 10 and partcunt < 10000:
@@ -119,13 +190,15 @@ class splmodel:
                     blocfile = open(blocname, "wb")
                     blocfile.write(blocbuff)
                     blocfile.close()
+                    del(blocbuff)
                     totlprog = totlprog + (100 / partcunt)
-                    print(str(cuntlist[blocname]) + "\t" + str(blocname) + " created!\t" + Style.DIM + \
-                          str(sizelist[blocname]) + " bytes\t" + Style.RESET_ALL + str(hashlist[blocname]) + "\t" + \
-                          Style.DIM + str(totlprog)[0:4] + "% completed" + Style.RESET_ALL)
-                self.makeldgr(hashlist, sizelist, cuntlist)
+                    print(str(cuntlist[blocname]) + "\t" + str(hashlist[blocname]) + "\t" + Style.DIM + \
+                          str(totlprog)[0:4] + "% completed" + Style.RESET_ALL + "\t" + Style.DIM + \
+                          str(sizelist[blocname]) + " bytes\t" + Style.RESET_ALL)
+                self.makeldgr(hashlist, sizelist, cuntlist, ".sbc")
                 endinsec = time.time()
                 totatime = str(endinsec - startsec).split(".")[0] + "." + str(endinsec - startsec).split(".")[1][0:2]
+                del(self.actibuff)
                 print("\n" + Fore.CYAN + "[SPLIT OPERATION COMPLETED]" + Fore.RESET + "\n" + \
                       "Parts created  : " + str(partcunt) + " parts \n" + \
                       "Ledger created : " + str(self.filename) + ".sbc \n" + \
@@ -225,7 +298,7 @@ class jinmodel:
         return joinable
 
     def joincunt(self):
-        if self.typesplt=="sbc":
+        if self.typesplt=="sbc" or self.typesplt=="sbs":
             totlpart = int(list(self.cuntlist.values())[-1])
             totlprog = 0
             if (self.pthealth()):
@@ -256,7 +329,7 @@ class jinmodel:
         else:
             print(Fore.RED + "[ERROR OCCURRED]" + Fore.RESET + "\n" + \
                   "Join procedure could not be initiated!\n" + \
-                  "This file was not split by count - Maybe it was split by size")
+                  "The ledger format is not supported")
 
-    def joinpart(self):
+    def joinsize(self):
         pass

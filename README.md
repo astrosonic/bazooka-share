@@ -3,7 +3,12 @@ Node-based shared network protocol emphasizing on security and decentralization
 
 ## Decentralised Union of Connected Environments (DUCE)
 
-### Under active development
+### Bazooka v0.0.1
+
+1. Create seeder/psuedo seeder/peer type of node in the network.
+2. Using special type of architecture to co-ordinate the work for the sudo-seeders/peer nodes.
+3. Tier jumping is enabled in the implementation.
+##### (DAB)
 
 ## File Archive Dispersal and Encryption (FADE)
 

@@ -44,7 +44,6 @@ def peer(data,addr,soc):
 seeder_thread=th.Thread(target=seeder)
 peer_threads={}
 sockets=[]
-avail_ports=iter([7000,7001,7002,7003,7004])
 """
 FIND SEEDER SHIT
 """

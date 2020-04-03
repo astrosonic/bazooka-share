@@ -16,10 +16,16 @@ Node-based shared network protocol emphasizing on security and decentralization
 2. Using special type of architecture to co-ordinate the work for the sudo-seeders/peer nodes.
 3. Tier jumping is enabled in the implementation.
 
-### Bazooka v0.0.2[Oncumming]
+### Bazooka v0.0.2
 
 1. Base program with Node.py usage
-2. Shadow clone teaser.
+2. Updated Node.py as initial declaration and later usage in peer.py
+3. 1st Tier implementation done without interconnection.
+
+### Bazooka v0.0.3[Upcumming]
+
+1. 1st Tier interconnection finalization.
+2. Shadow clone teaser(Maybe?)
 
 
 ## File Archive Dispersal and Encryption (FADE)

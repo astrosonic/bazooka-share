@@ -22,10 +22,14 @@ Node-based shared network protocol emphasizing on security and decentralization
 2. Updated Node.py as initial declaration and later usage in peer.py
 3. 1st Tier implementation done without interconnection.
 
-### Bazooka v0.0.3[Upcumming]
+### Bazooka v0.0.3
 
-1. 1st Tier interconnection finalization.
-2. Shadow clone teaser(Maybe?)
+1. 1st Tier interconnection.
+2. Other Tier interconnection skeleton ready.
+
+### Bazooka v0.0.4[UPCUMMING]
+
+1. Fully functional architecture implementation.
 
 
 ## File Archive Dispersal and Encryption (FADE)

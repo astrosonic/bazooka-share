@@ -43,16 +43,21 @@ def seed(soc,addr):
 		time1=time.time()
 		while True:
 			try:
-				soc.sendto(msg,ans_addr)
-				print(soc.recvfrom(1024),ans_addr,"IN THREAD",sep="\t")
-				time.sleep(0.1)
 				if(time.time()-time1>=5):
 					soc.sendto("CHAIN".encode(),ans_addr)
+					chain,_=soc.recvfrom(2048)
+					chain=chain.decode()
+					print(chain,"\t FROM PEER",number)
+					seeder.update_chain(chain,number)
 					refresh(soc,seeder.get_chain(),ans_addr)
 					print("CHAIN UPDATE")
 					time1=time.time()
-			except:
-				pass
+				else:
+					soc.sendto(msg,ans_addr)
+					print(soc.recvfrom(1024),"IN THREAD",sep="\t")
+				time.sleep(0.2)
+			except OSError as e:
+				print(e)
 while True:
 	thread=[]
 	try:

@@ -49,7 +49,8 @@ class Seeder():
 class Peer(Seeder):
 
     def __init__(self):
-        pass
+        self.fellow_peer={}
+        self.seeder_chain={}
 
     def update_data(self,size,number):
         super().__init__(size)

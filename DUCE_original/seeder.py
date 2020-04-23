@@ -3,6 +3,7 @@ import socket as s
 import threading as th
 import json
 import time
+import fade_modern
 
 S=s.socket(s.AF_INET,s.SOCK_DGRAM)
 HOST=s.gethostbyname(s.gethostname())
@@ -11,12 +12,30 @@ S.bind((HOST,6969))
 peer_threads={}
 sockets=[]
 
+ledgobjc = ""
+blocqant = ""
+
+def mainfunc():
+	print("[S.P.E.E.D.] " + "\n" +
+		  "[Defaulted file segregation to SPLIT-BY-COUNT]" + "\n" +
+		  "[LOG] You have joined the network as a seeder")
+	global filename, blocqant, ledgobjc
+	filename = str(input("[QUE] Locate the file you wish to send "))
+	blocqant = int(input("[QUE] Enter the block count "))
+	spltobjc = fade_modern.splmodel(filename)
+	spltobjc.spltcunt(blocqant)
+	ledgname = filename + ".sbc"
+	ledgfile = open(ledgname,"rb")
+	ledgobjc = ledgfile.read()
+	ledgfile.close()
+
 """
 INIT FILE NAME AND GENERATE BLOCKS WITH LEDGER
 ASK FOR TIER SIZE
 """
 
 seeder=Seeder(3)
+# Add functionality to be able to modify this later
 
 def refresh(soc,chain,addr):
 	try:
@@ -24,7 +43,6 @@ def refresh(soc,chain,addr):
 		return True
 	except OSError as e:
 		return False
-
 
 def seed(soc,addr):
 	msg="ORA ORA ORA".encode()

@@ -113,7 +113,7 @@ class splmodel:
             else:
                 partcunt = self.allcsize(partsize)[0]
                 poselist = self.allcsize(partsize)[1]
-                hashlist, sizelist, cuntlist = {}, {}, {}
+                hashlist, sizelist, cuntlist, cuntdisp = {}, {}, {}, {}
                 totlprog = 0
                 print(Fore.CYAN + "[PROTEXON SPLITTER by t0xic0der]" + Fore.RESET + "\n" + \
                       "File name   : " + self.filename + "\n" + \
@@ -125,13 +125,16 @@ class splmodel:
                 for i in range(1, partcunt + 1):
                     if partcunt >= 10 and partcunt <= 100:
                         blocname = self.filename + "." + self.nogenten(i)
-                        cuntlist[blocname] = self.nogenten(i)
+                        cuntlist[blocname] = i
+                        cuntdisp[blocname] = self.nogenten(i)
                     elif partcunt >= 100 and partcunt <= 1000:
                         blocname = self.filename + "." + self.nogenhun(i)
-                        cuntlist[blocname] = self.nogenhun(i)
+                        cuntlist[blocname] = i
+                        cuntdisp[blocname] = self.nogenhun(i)
                     elif partcunt >= 1000 and partcunt < 10000:
                         blocname = self.filename + "." + self.nogenthd(i)
-                        cuntlist[blocname] = self.nogenthd(i)
+                        cuntlist[blocname] = i
+                        cuntdisp[blocname] = self.nogenthd(i)
                     blocbuff = self.actibuff[poselist[i - 1]:poselist[i]]
                     hashlist[blocname] = hashlib.sha512(blocbuff).hexdigest()
                     sizelist[blocname] = len(blocbuff)
@@ -140,7 +143,7 @@ class splmodel:
                     blocfile.close()
                     del(blocbuff)
                     totlprog = totlprog + (100 / partcunt)
-                    print(str(cuntlist[blocname]) + "\t"+  str(hashlist[blocname]) + "\t" + Style.DIM + \
+                    print(str(cuntdisp[blocname]) + "\t"+  str(hashlist[blocname]) + "\t" + Style.DIM + \
                           str(totlprog)[0:4] + "% completed" + Style.RESET_ALL + "\t" + Style.DIM + \
                           str(sizelist[blocname]) + " bytes\t" + Style.RESET_ALL)
                 self.makeldgr(hashlist, sizelist, cuntlist, ".sbs")
@@ -165,7 +168,7 @@ class splmodel:
                       "The number of parts is greater than the byte size of your file")
             else:
                 poselist = self.allcbyte(partcunt)
-                hashlist, sizelist, cuntlist = {}, {}, {}
+                hashlist, sizelist, cuntlist, cuntdisp = {}, {}, {}, {}
                 totlprog = 0
                 print(Fore.CYAN + "[PROTEXON SPLITTER by t0xic0der]" + Fore.RESET + "\n" + \
                       "File name   : " + self.filename + "\n" + \
@@ -177,13 +180,16 @@ class splmodel:
                 for i in range(1, partcunt + 1):
                     if partcunt >= 10 and partcunt <= 100:
                         blocname = self.filename + "." + self.nogenten(i)
-                        cuntlist[blocname] = self.nogenten(i)
+                        cuntlist[blocname] = i
+                        cuntdisp[blocname] = self.nogenten(i)
                     elif partcunt >= 100 and partcunt <= 1000:
                         blocname = self.filename + "." + self.nogenhun(i)
-                        cuntlist[blocname] = self.nogenhun(i)
+                        cuntlist[blocname] = i
+                        cuntdisp[blocname] = self.nogenhun(i)
                     elif partcunt >= 1000 and partcunt < 10000:
                         blocname = self.filename + "." + self.nogenthd(i)
-                        cuntlist[blocname] = self.nogenthd(i)
+                        cuntlist[blocname] = i
+                        cuntdisp[blocname] = self.nogenthd(i)
                     blocbuff = self.actibuff[poselist[i - 1]:poselist[i]]
                     hashlist[blocname] = hashlib.sha512(blocbuff).hexdigest()
                     sizelist[blocname] = len(blocbuff)
@@ -192,7 +198,7 @@ class splmodel:
                     blocfile.close()
                     del(blocbuff)
                     totlprog = totlprog + (100 / partcunt)
-                    print(str(cuntlist[blocname]) + "\t" + str(hashlist[blocname]) + "\t" + Style.DIM + \
+                    print(str(cuntdisp[blocname]) + "\t" + str(hashlist[blocname]) + "\t" + Style.DIM + \
                           str(totlprog)[0:4] + "% completed" + Style.RESET_ALL + "\t" + Style.DIM + \
                           str(sizelist[blocname]) + " bytes\t" + Style.RESET_ALL)
                 self.makeldgr(hashlist, sizelist, cuntlist, ".sbc")
@@ -207,6 +213,20 @@ class splmodel:
             print(Fore.RED + "[ERROR OCCURRED]" + Fore.RESET + "\n" + \
                   "Splitting operation could not be initiated!\n" + \
                   "We do not recommend splitting in this many parts")
+
+def fetcblck(self, blckordr, ledgname):
+    database = sqlite3.connect(ledgname)
+    acticurs = database.cursor()
+    qurytext = "select * from from ldgrbase where partnumb = '" + str(blckordr) + "'"
+    rsltobjc = acticurs.execute(qurytext)
+    rsltobjc = rsltobjc.fetchall()
+    retndict = {
+        "blckordr": rsltobjc[0],
+        "blckname": rsltobjc[1],
+        "bytesize": rsltobjc[2],
+        "sha512dg": rsltobjc[3],
+    }
+    return retndict
 
 class wrngldgr(Exception):
     def __init__(self,ldgrextn):

@@ -4,6 +4,7 @@ import threading as th
 import json
 import time
 import fade_modern
+import random
 
 S=s.socket(s.AF_INET,s.SOCK_DGRAM)
 HOST=s.gethostbyname(s.gethostname())
@@ -14,6 +15,7 @@ sockets=[]
 
 ledgobjc = ""
 blocqant = ""
+ledgname = ""
 
 def mainfunc():
 	print("[S.P.E.E.D.] " + "\n" +
@@ -24,6 +26,7 @@ def mainfunc():
 	blocqant = int(input("[QUE] Enter the block count "))
 	spltobjc = fade_modern.splmodel(filename)
 	spltobjc.spltcunt(blocqant)
+	global ledgname
 	ledgname = filename + ".sbc"
 	ledgfile = open(ledgname,"rb")
 	ledgobjc = ledgfile.read()
@@ -82,6 +85,10 @@ def seed(soc,addr):
 					1. SELECT BLOCK NUMBER AND SEND BLOCK
 					2. BLOCK CHECKING ON PEER SIDE
 					"""
+
+					blckordr = random.randint(1,blocqant)
+					blckinfo = fade_modern.fetcblck(blckordr, ledgname)
+
 					soc.sendto(msg,ans_addr)
 					print(soc.recvfrom(1024),"IN THREAD",sep="\t")
 				time.sleep(0.2)

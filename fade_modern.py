@@ -110,6 +110,7 @@ class splmodel:
                 print(Fore.RED + "[ERROR OCCURRED]" + Fore.RESET + "\n" + \
                       "Splitting operation could not be initiated!\n" + \
                       "The size per block is greater than the byte size of your file")
+                return False
             else:
                 partcunt = self.allcsize(partsize)[0]
                 poselist = self.allcsize(partsize)[1]
@@ -155,10 +156,12 @@ class splmodel:
                       "Block size     : " + str(partsize) + " bytes \n" + \
                       "Ledger created : " + str(self.filename) + ".sbs \n" + \
                       "Time taken     : " + str(totatime) + " seconds \n")
+                return True
         else:
             print(Fore.RED + "[ERROR OCCURRED]" + Fore.RESET + "\n" + \
                   "Splitting operation could not be initiated!\n" + \
                   "We do not recommend splitting into blocks of this size")
+            return False
 
     def spltcunt(self,partcunt):
         if partcunt >= 10 and partcunt < 10000:
@@ -166,6 +169,7 @@ class splmodel:
                 print(Fore.RED + "[ERROR OCCURRED]" + Fore.RESET + "\n" + \
                       "Splitting operation could not be initiated!\n" + \
                       "The number of parts is greater than the byte size of your file")
+                return False
             else:
                 poselist = self.allcbyte(partcunt)
                 hashlist, sizelist, cuntlist, cuntdisp = {}, {}, {}, {}
@@ -209,10 +213,12 @@ class splmodel:
                       "Parts created  : " + str(partcunt) + " parts \n" + \
                       "Ledger created : " + str(self.filename) + ".sbc \n" + \
                       "Time taken     : " + str(totatime) + " seconds \n")
+                return True
         else:
             print(Fore.RED + "[ERROR OCCURRED]" + Fore.RESET + "\n" + \
                   "Splitting operation could not be initiated!\n" + \
                   "We do not recommend splitting in this many parts")
+            return True
 
 def fetcblck(self, blckordr, ledgname):
     database = sqlite3.connect(ledgname)

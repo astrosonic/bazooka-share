@@ -230,7 +230,7 @@ def fetcblck(self, blckordr, ledgname):
     blckname = rsltobjc[1]
     bytesize = rsltobjc[2]
     sha512dg = rsltobjc[3]
-    retnlist = [blckordr, blckname bytesize, sha512dg]
+    retnlist = [blckordr, blckname, bytesize, sha512dg]
     return retnlist
 
 class wrngldgr(Exception):

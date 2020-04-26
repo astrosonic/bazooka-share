@@ -223,7 +223,7 @@ class splmodel:
 def fetcblck(self, blckordr, ledgname):
     database = sqlite3.connect(ledgname)
     acticurs = database.cursor()
-    qurytext = "select * from from ldgrbase where partnumb = '" + str(blckordr) + "'"
+    qurytext = "select * from ldgrbase where partnumb = '" + str(blckordr) + "'"
     rsltobjc = acticurs.execute(qurytext)
     rsltobjc = rsltobjc.fetchall()
     retndict = {

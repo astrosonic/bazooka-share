@@ -1,4 +1,4 @@
-# protexon v0.06
+# Bazooka-Share v0.06
 Node-based shared network protocol emphasizing on security and decentralization
 
 ## Decentralised Union of Connected Environments (DUCE)

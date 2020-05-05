@@ -225,7 +225,7 @@ def fetcblck(blckordr, ledgname):
     acticurs = database.cursor()
     qurytext = "select * from ldgrbase where partnumb = '" + str(blckordr) + "'"
     rsltobjc = acticurs.execute(qurytext)
-    rsltobjc = rsltobjc.fetchall()
+    rsltobjc = rsltobjc.fetchone()
     return rsltobjc
 
 class wrngldgr(Exception):

@@ -122,21 +122,69 @@ def seeder(S,ip,number):
 	peer_obj.update_data(size,number)
 	chain,_=S.recvfrom(1024)
 	chain=json.loads(chain.decode())
+
+	name,_=S.recvfrom(1024)
+	if(name[:6]==b"LEDGER"):
+		name=name.decode()
+		ledger_name=name.split("-")[-1]
+		ledger=open(ledger_name,"wb")
+		temp,_=S.recvfrom(1024)
+		while temp!=b"LEDGER_OVER":
+			ledger.write(temp)
+			temp,_=S.recvfrom(1024)
+	else:
+		print("LEDGER ERROR")
+		sys.exit()
+	#ledger,_=S.recvfrom(1024)
+	total_blocks,_=S.recvfrom(1024)
+	#print(ledger,"LEDGER")
+	print(total_blocks)
 	peer_obj.seeder_chain["CHAIN"],peer_obj.seeder_chain["IP_TABLE"]=json.loads(chain[0]),json.loads(chain[1])
 	print(peer_obj.seeder_chain,"INITIAL D")
 	"""
 	RECV LEDGER SHIT
 	"""
+	
 	t1=time.time()
 	ctr=0
 	while True:
 		try:
-			ans,_=S.recvfrom(1024)
-			print(ans)
+			data,_=S.recvfrom(1024)
+			if(data==b"INIT BLOCK TRANSFER"):
+				meta,_=S.recvfrom(1024)
+				block_number,length=json.loads(meta.decode())
+				print(block_number,length,sep="\t")	
+				break
+				"""
+				GET FILE INFO FROM LEDGER BASED ON BLOCK NUMBER
+				"""
+				filename=""
+				file_obj=open(filename,"wb")
+				dat,_=file_obj.recvfrom(1024)
+				while dat!=b"OVERDIA":
+					file_obj.write(dat)
+					dat,_=file_obj.recvfrom(1024)
+				file_obj.close()
+				"""
+				VERIFY FILE CREDENTIALS AND SHIT
+				"""
+				S.sendto(b"DONE BLOCK NUMBER{0}".format(block_number))
+
+				resp,_=S.recvfrom(1024)
+				if(resp==b"CHAIN"):
+					S.sendto(json.dumps(peer_obj.seeder_chain["CHAIN"][str(peer_obj.number)]).encode(),ip)
+					chain,_=S.recvfrom(2048)
+					chain=json.loads(chain.decode())
+					peer_obj.seeder_chain["CHAIN"],peer_obj.seeder_chain["IP_TABLE"]=json.loads(chain[0]),json.loads(chain[1])
+					print(peer_obj.seeder_chain,"NEW CHAIN")
+					process_chain(peer_obj.seeder_chain,S)
+					
+			#ans,_=S.recvfrom(1024)
 			"""
 			HERE IF BLOCK TRANSFER IS COMPLETE THEN CHAIN WILL BE UPDATED
 			ADD BLOCK CHECKING PROCEDURE
 			eg: block_checking(block_recieved)
+			"""
 			"""
 			if(time.time()-t1>=5):
 				peer_obj.seeder_chain["CHAIN"][str(peer_obj.number)]['Data'].append(ctr)
@@ -150,13 +198,20 @@ def seeder(S,ip,number):
 				peer_obj.seeder_chain["CHAIN"],peer_obj.seeder_chain["IP_TABLE"]=json.loads(chain[0]),json.loads(chain[1])
 				print(peer_obj.seeder_chain,"NEW CHAIN")
 				process_chain(peer_obj.seeder_chain,S)
-			"""
-			IF WANT ACKNOWLEGDMENT CAN BE SENT TO SEEDER FOR THE BLOCK
-			DONE IN ELSE PART BELOW
-			"""
 			else:
+				
+
+
 				S.sendto(msg,ip)
-			time.sleep(0.2)#####REMOVE SLEEP FOR SPEED TESTING
+
+				
+
+			THIS COMMENT IS TRASH
+			"""
+
+
+
+			#time.sleep(0.2)#####REMOVE SLEEP FOR SPEED TESTING
 		except OSError as e:
 			print(e)
 

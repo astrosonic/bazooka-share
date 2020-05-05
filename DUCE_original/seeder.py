@@ -23,7 +23,8 @@ def mainfunc():
 		  "[LOG] You have joined the network as a seeder")
 	global filename, blocqant, ledgobjc
 	filename = str(input("[QUE] Locate the file you wish to send "))
-	blocqant = int(input("[QUE] Enter the block count "))
+	#blocqant = int(input("[QUE] Enter the block count "))
+	blocqant=20
 	spltobjc = fade_modern.splmodel(filename)
 	spltobjc.spltcunt(blocqant)
 	global ledgname
@@ -59,6 +60,15 @@ def seed(soc,addr):
 			seeder.init_connection(addr)
 			soc.sendto(json.dumps(seeder.size).encode(),ans_addr)
 			flag=refresh(soc,seeder.get_chain(),ans_addr)
+			soc.sendto(("LEDGER-"+ledgname).encode(),ans_addr)
+			ledger_read_file=open(ledgname,"rb")
+			ledger_read=ledger_read_file.read()
+			for i in range(len(ledger_read)//1024+1):
+				soc.sendto(ledger_read[i*1024:(i+1)*1024],ans_addr)
+			soc.sendto(b"LEGDER_OVER",ans_addr)
+			ledger_read_file.close()
+			#soc.sendto(json.dumps(ledgobjc).encode(),ans_addr)
+			soc.sendto(json.dumps(blocqant).encode(),ans_addr)
 			"""
 			SEND LEDGER SHIT
 			"""
@@ -71,6 +81,7 @@ def seed(soc,addr):
 		time1=time.time()
 		while True:
 			try:
+				"""
 				if(time.time()-time1>=5):
 					soc.sendto("CHAIN".encode(),ans_addr)
 					chain,_=soc.recvfrom(2048)
@@ -80,20 +91,33 @@ def seed(soc,addr):
 					refresh(soc,seeder.get_chain(),ans_addr)
 					print("CHAIN UPDATE")
 					time1=time.time()
-				else:
-					"""
-					1. SELECT BLOCK NUMBER AND SEND BLOCK
-					2. BLOCK CHECKING ON PEER SIDE
-					"""
+				"""
+				#else:
+				
+				blckordr=set(range(1,blocqant+1)).difference(set(seeder.children_chain[number]['Data']))
+				print(blckordr)
+				blckinfo = fade_modern.fetcblck(blckordr, ledgname)
+				temp=[blckordr,len(blckinfo)]
+				soc.sendto(b"INIT BLOCK TRANSFER",ans_addr)
+				soc.sendto(json.dumps(temp).encode(),ans_addr)
+				for i in range(len(blckinfo)//1024+1):
+					soc.sendto(blckinfo[i*1024:(i+1)*1024],ans_addr)
+				soc.sendto(b"OVERIDA",ans_addr)
+				#soc.sendto(msg,ans_addr)
+				print(soc.recvfrom(1024),"IN THREAD",sep="\t")
 
-					blckordr = random.randint(1,blocqant)
-					blckinfo = fade_modern.fetcblck(blckordr, ledgname)
+				soc.sendto("CHAIN".encode(),ans_addr)
+				chain,_=soc.recvfrom(2048)
+				chain=chain.decode()
+				print(chain,"\t FROM PEER",number)
+				seeder.update_chain(chain,number)
+				refresh(soc,seeder.get_chain(),ans_addr)
+				print("CHAIN UPDATE")
 
-					soc.sendto(msg,ans_addr)
-					print(soc.recvfrom(1024),"IN THREAD",sep="\t")
-				time.sleep(0.2)
+				#time.sleep(0.2)
 			except OSError as e:
 				print(e)
+mainfunc()
 while True:
 	thread=[]
 	try:

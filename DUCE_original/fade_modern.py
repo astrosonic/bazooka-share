@@ -226,12 +226,7 @@ def fetcblck(blckordr, ledgname):
     qurytext = "select * from ldgrbase where partnumb = '" + str(blckordr) + "'"
     rsltobjc = acticurs.execute(qurytext)
     rsltobjc = rsltobjc.fetchall()
-    blckordr = rsltobjc[0]
-    blckname = rsltobjc[1]
-    bytesize = rsltobjc[2]
-    sha512dg = rsltobjc[3]
-    retnlist = [blckordr, blckname, bytesize, sha512dg]
-    return retnlist
+    return rsltobjc
 
 class wrngldgr(Exception):
     def __init__(self,ldgrextn):

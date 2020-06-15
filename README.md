@@ -27,10 +27,13 @@ Node-based shared network protocol emphasizing on security and decentralization
 1. 1st Tier interconnection.
 2. Other Tier interconnection skeleton ready.
 
-### Bazooka v0.0.4[UPCUMMING]
+### Bazooka v0.0.4
 
 1. Fully functional architecture implementation.
 
+### Bazooka v0.0.5
+
+1. Integration with FADE done.
 
 ## File Archive Dispersal and Encryption (FADE)
 
